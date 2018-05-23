@@ -1,9 +1,8 @@
 plugins {
-  id 'edu.wpi.first.GradleJni' version '0.1.5'
+  id 'application'
+  id 'cpp'
+  id 'edu.wpi.first.GradleJni' version '0.2.1'
 }
-
-apply plugin: 'application'
-apply plugin: 'cpp'
 
 model {
   components {
