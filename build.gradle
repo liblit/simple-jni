@@ -1,0 +1,16 @@
+plugins {
+  id 'edu.wpi.first.GradleJni' version '0.1.5'
+}
+
+apply plugin: 'application'
+
+model {
+  components {
+    library(JniNativeLibrarySpec) {
+      enableCheckTask true
+      javaCompileTasks << compileJava
+    }
+  }
+}
+
+mainClassName = 'Main'
