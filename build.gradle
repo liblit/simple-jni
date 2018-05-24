@@ -12,9 +12,9 @@ model {
   }
 
   tasks.run {
-    def lib = linkInsideSharedLibrary
+    def lib = $.binaries.insideSharedLibrary
     dependsOn lib
-    systemProperty 'java.library.path', lib.destinationDirectory.get()
+    systemProperty 'java.library.path', lib.sharedLibraryFile.parent
   }
 }
 
