@@ -11,49 +11,7 @@ plugins {
 
 mainClassName = 'Main'
 
-
-////////////////////////////////////////////////////////////////////////
-//
-//  extra checker tasks to verify runnability in various contexts
-//
-
-class CheckedOutput extends Exec {
-  CheckedOutput() {
-    standardOutput = new ByteArrayOutputStream()
-    doLast {
-      assert standardOutput.toString() ==~ '(Picked up _JAVA_OPTIONS: .*\n)?before native call\ninside native call\nafter native call\n'
-    }
-    project.check.dependsOn this
-  }
-
-  void fromDist(AbstractArchiveTask distTask, Object distTreeBuilder) {
-    dependsOn distTask
-    doFirst {
-      project.copy {
-	from distTreeBuilder(distTask.archivePath)
-	into temporaryDir
-      }
-    }
-    def startScripts = project.startScripts
-    commandLine "${temporaryDir}/${startScripts.applicationName}/${startScripts.executableDir}/${startScripts.applicationName}"
-  }
-}
-
-task checkRun(type: CheckedOutput, dependsOn: classes) {
-  commandLine './gradlew', '--quiet', 'run'
-}
-
-task checkRunInstallDist(type: CheckedOutput, dependsOn: installDist) {
-  commandLine "${files(installDist).singleFile}/${startScripts.executableDir}/${startScripts.applicationName}"
-}
-
-task checkRunDistTar(type: CheckedOutput) {
-  fromDist distTar, project.&tarTree
-}
-
-task checkRunDistZip(type: CheckedOutput) {
-  fromDist distZip, project.&zipTree
-}
+apply from: 'test.gradle'	// OK to ignore
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -90,10 +48,6 @@ model {
 	unixScript.text = unixScript.text.replace('@APP_HOME@', '$APP_HOME')
 	windowsScript.text = windowsScript.text.replace('@APP_HOME@', '%~dp0..')
       }
-    }
-
-    checkRun {
-      dependsOn $.binaries.insideSharedLibrary
     }
   }
 }

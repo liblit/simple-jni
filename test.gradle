@@ -1,0 +1,54 @@
+////////////////////////////////////////////////////////////////////////
+//
+//  extra checker tasks to verify runnability in various contexts
+//
+//  These extra checks verify that this example application runs
+//  correctly in various contexts.  These tests are not really needed
+//  when using the Gradle JNI plugin, though.  So it is OK to ignore
+//  all of the material in this file when treating this project as a
+//  basic Gradle JNI plugin example.
+//
+
+class CheckedOutput extends Exec {
+  CheckedOutput() {
+    standardOutput = new ByteArrayOutputStream()
+    doLast {
+      assert standardOutput.toString() ==~ '(Picked up _JAVA_OPTIONS: .*\n)?before native call\ninside native call\nafter native call\n'
+    }
+    project.check.dependsOn this
+  }
+
+  void fromDist(AbstractArchiveTask distTask, Object distTreeBuilder) {
+    dependsOn distTask
+    doFirst {
+      project.copy {
+	from distTreeBuilder(distTask.archivePath)
+	into temporaryDir
+      }
+    }
+    def startScripts = project.startScripts
+    commandLine "${temporaryDir}/${startScripts.applicationName}/${startScripts.executableDir}/${startScripts.applicationName}"
+  }
+}
+
+task checkRun(type: CheckedOutput, dependsOn: classes) {
+  commandLine './gradlew', '--quiet', 'run'
+}
+
+task checkRunInstallDist(type: CheckedOutput, dependsOn: installDist) {
+  commandLine "${files(installDist).singleFile}/${startScripts.executableDir}/${startScripts.applicationName}"
+}
+
+task checkRunDistTar(type: CheckedOutput) {
+  fromDist distTar, project.&tarTree
+}
+
+task checkRunDistZip(type: CheckedOutput) {
+  fromDist distZip, project.&zipTree
+}
+
+model {
+  tasks.checkRun {
+    dependsOn $.binaries.insideSharedLibrary
+  }
+}
