@@ -6,7 +6,7 @@ plugins {
 
 model {
   components {
-    library(JniNativeLibrarySpec) {
+    inside(JniNativeLibrarySpec) {
       javaCompileTasks << compileJava
     }
   }
