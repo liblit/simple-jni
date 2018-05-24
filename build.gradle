@@ -4,6 +4,8 @@ plugins {
   id 'edu.wpi.first.GradleJni' version '0.2.1'
 }
 
+mainClassName = 'Main'
+
 model {
   components {
     inside(JniNativeLibrarySpec) {
@@ -17,5 +19,3 @@ model {
     systemProperty 'java.library.path', lib.sharedLibraryFile.parent
   }
 }
-
-mainClassName = 'Main'
