@@ -1,4 +1,8 @@
 class Main {
+    static {
+	System.loadLibrary("inside");
+    }
+
     static private native void nativeCall();
 
     static public void main(String[] args) {

@@ -10,6 +10,12 @@ model {
       javaCompileTasks << compileJava
     }
   }
+
+  tasks.run {
+    def lib = linkInsideSharedLibrary
+    dependsOn lib
+    systemProperty 'java.library.path', lib.destinationDirectory.get()
+  }
 }
 
 mainClassName = 'Main'
