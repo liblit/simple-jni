@@ -7,7 +7,6 @@ plugins {
 model {
   components {
     library(JniNativeLibrarySpec) {
-      enableCheckTask true
       javaCompileTasks << compileJava
     }
   }
