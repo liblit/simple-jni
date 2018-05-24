@@ -13,9 +13,28 @@ model {
     }
   }
 
-  tasks.run {
-    def lib = $.binaries.insideSharedLibrary
-    dependsOn lib
-    systemProperty 'java.library.path', lib.sharedLibraryFile.parent
+  tasks {
+    run {
+      // help JVM find native shared library
+      def lib = $.binaries.insideSharedLibrary
+      dependsOn lib
+      systemProperty 'java.library.path', lib.sharedLibraryFile.parent
+    }
+
+    startScripts {
+      // include native shared library in all distributions
+      def lib = $.binaries.insideSharedLibrary
+      dependsOn lib
+      distributions.main.contents.from(lib.sharedLibraryFile) {
+	into 'lib'
+      }
+
+      // help JVM find native shared library
+      defaultJvmOpts = ['-Djava.library.path=@APP_HOME@/lib']
+      doLast {
+	unixScript.text = unixScript.text.replace('@APP_HOME@', '$APP_HOME')
+	windowsScript.text = windowsScript.text.replace('@APP_HOME@', '%~dp0..')
+      }
+    }
   }
 }
